@@ -12,7 +12,8 @@ default = ["std"]
 std = []
 
 [dependencies]
-sqlparser = { path = "../sqlparser-rs" }
+# sqlparser = { path = "../sqlparser-rs" }
+sqlparser = { git = "https://github.com/siddontang/sqlparser-rs.git" }
 
 [dev-dependencies]
 
