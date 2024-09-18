@@ -1,0 +1,22 @@
+[package]
+name = "tidbparser"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "tidbparser"
+path = "src/lib.rs"
+
+[features]
+default = ["std"]
+std = []
+
+[dependencies]
+sqlparser = { path = "../sqlparser-rs" }
+
+[dev-dependencies]
+
+
+[[example]]
+name = "cli"
+path = "examples/cli.rs"
