@@ -43,7 +43,7 @@ impl<'a> TiDBParser<'a> {
                     return self.parse_admin_show();
                 }
                 _ => {
-                    unreachable!()
+                    return parser_err!("Unexpected keyword after ADMIN");
                 }
             }
         }
@@ -57,7 +57,7 @@ impl<'a> TiDBParser<'a> {
                     return self.parse_admin_show_ddl();
                 }
                 _ => {
-                    unreachable!()
+                    return parser_err!("Unexpected keyword after ADMIN SHOW");
                 }
             }
         }
@@ -68,25 +68,16 @@ impl<'a> TiDBParser<'a> {
         let mut num = None;
         let mut where_clause = None;
 
-        loop {
-            let token = self.parser.peek_token().token;
+        // Parse number if present
+        if let Token::Number(_, _) = self.parser.peek_token().token {
+            num = Some(self.parser.parse_number_value()?);
+        }
 
-            match token {
-                Token::SemiColon | Token::EOF => {
-                    break;
-                }
-                Token::Number(_, _) => {
-                    num = Some(self.parser.parse_number_value()?);
-                }
-                Token::Word(w) if w.keyword == Keyword::WHERE => {
-                    self.parser.next_token();
-                    where_clause = Some(self.parser.parse_expr()?);
-                }
-                _ => {
-                    return Err(ParserError::ParserError(format!(
-                        "Unexpected token: {token}"
-                    )));
-                }
+        // Parse WHERE clause if present
+        if let Token::Word(w) = self.parser.peek_token().token {
+            if w.keyword == Keyword::WHERE {
+                self.parser.next_token();
+                where_clause = Some(self.parser.parse_expr()?);
             }
         }
 
@@ -103,7 +94,7 @@ impl<'a> TiDBParser<'a> {
                     return self.parse_admin_show_ddl_jobs();
                 }
                 _ => {
-                    unreachable!()
+                    return parser_err!("Unexpected keyword after ADMIN SHOW DDL");
                 }
             }
         } else {
